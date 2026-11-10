@@ -21,6 +21,12 @@ curl -fL -o vendor/UltraArm_P340_3D_230918.stp \
   https://download.elephantrobotics.com/Product_3d_files/230918/UltraArm_P340_3D_230918.stp
 ```
 
+## 残作業の管理
+
+残りの作業は、`task` ラベルを付けた [GitHub Issue](https://github.com/0x0c/ultraarm-smartphone-endeffctor/issues?q=is%3Aissue+label%3Atask) で管理している。
+各 Issue の本文に完了条件と前提の Issue があり、実機で確かめた結果はその Issue にコメントで書く。
+Claude Code では `/start-issue` で、着手できる Issue を選んで担当を付け、作業ブランチを切ってから作業を始められる。
+
 ## 部品表
 
 必要な部品、材料、工具は [`bom.csv`](bom.csv) にまとめてある。
