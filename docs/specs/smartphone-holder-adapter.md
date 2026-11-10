@@ -1,6 +1,6 @@
 # スマホホルダー用エンドエフェクタ
 
-> ステータス: ドラフト
+> ステータス: 実装中（モデルとテストは完了、実機での確認待ち）
 > 対象: ultraArm P340 の先端に装着する 3D プリント部品（`cad/`）
 > 関連: [ultraArm P340 製品仕様](https://docs.elephantrobotics.com/docs/ultraArm-en/1-BriefIntroduction/2-Product/1-UltraArmP340/1-IntroductionToProductParameters.html)、[スマホホルダー商品ページ](https://www.amazon.co.jp/dp/B00WILM97G)
 
@@ -164,10 +164,14 @@ STEP モデルのリンク構成から、受け口は肘の部品と平行四辺
 | 名前 | 型 | 初期値 | 意味 |
 |---|---|---|---|
 | `fit_clearance` | `float` | `0.2` | 受け口と差し込み部の片側のすきま（mm） |
-| `beam_length` | `float` | `60.0` | 差し込み部の前端からホルダー取り付け面までの水平距離（mm） |
+| `beam_length` | `float` | `30.0` | 差し込み部の前端からホルダー取り付け面までの水平距離（mm）。つまみねじの頭を回す余地で決まる |
 | `beam_thickness` | `float` | `6.0` | 梁の厚さ（mm） |
 | `mount_plate_thickness` | `float` | `5.0` | ホルダー取り付け面の板厚（mm） |
 | `screw_hole_diameter` | `float` | `6.6` | 1/4 インチのつまみねじを通す穴の径（mm） |
+| `screw_hole_height` | `float` | `22.0` | ねじ穴の中心の高さ（底面から、mm）。ホルダーの実寸を測って決める |
+| `mount_plate_width` | `float` | `30.0` | ホルダー取り付け面の幅（mm） |
+| `mount_plate_height` | `float` | `34.0` | ホルダー取り付け面の高さ（底面から、mm） |
+| `gusset_size` | `float` | `12.0` | 梁と取り付け面をつなぐ三角リブの辺の長さ（mm） |
 | `steel_pin_diameter` | `float` | `3.0` | 舌片の底に圧入する鋼製の平行ピンの径（mm） |
 | `steel_pin_length` | `float` | `20.0` | 同じく平行ピンの長さ（mm） |
 | `steel_pin_press_fit` | `float` | `0.1` | ピンを圧入するための溝幅の詰め代（mm）。試作で決める |
@@ -205,13 +209,13 @@ PLA は夏場の室温や直射日光で変形しやすく、ゴムワッシャ�
 
 | # | やること | 触るファイル | 完了条件 | 前提 |
 |---|---|---|---|---|
-| 1 | ✅ CadQuery と pytest の開発環境を用意し、`build/` と `vendor/` を Git の管理から外す | `pyproject.toml`、`.gitignore` | `python -c "import cadquery"` が成功し、`pytest` が 0 件で正常終了する | — |
+| 1 | ✅ CadQuery と pytest の開発環境を用意し、`build/` と `vendor/` を Git の管理から外す | `pyproject.toml`、`.gitignore` | `python -c "import cadquery"` が成功し、`pytest` が正常終了する（環境の疎通を確かめるテスト 1 件） | — |
 | 2 | ✅ 公式 STEP を `vendor/` に置き、受け口の内形の寸法、吸着面の構造、ラッチの位置、先端が水平を保つリンク構成かを読み取るスクリプトを書く | `scripts/inspect_step.py` | スクリプトが受け口の主要寸法を出力し、その値を README の「計測値」節に記録している。先端が水平を保つかの結論も記録している | 1 |
 | 3 | ✅ 差し込み部だけの試験片のモデルを書き、STL を出力する | `cad/params.py`、`cad/coupon.py`、`scripts/build.py` | `build/coupon.stl` が生成され、干渉テストが通る | 2 |
-| 4 | 試験片を印刷して鋼製ピンを圧入し、受け口への挿入と吸着を実機で確かめ、`fit_clearance` と `steel_pin_press_fit` を確定させる | `cad/params.py`、`README.md` | 試験片が工具なしで抜き差しでき、差し込むと磁石で底まで引き込まれる。前方へ指で押してもがたつかない。確定した値を README に記録している | 3 |
+| 4 | ⏳ 実機待ち。試験片を印刷して鋼製ピンを圧入し、受け口への挿入と吸着を実機で確かめ、`fit_clearance` と `steel_pin_press_fit` を確定させる | `cad/params.py`、`README.md` | 試験片が工具なしで抜き差しでき、差し込むと磁石で底まで引き込まれる。前方へ指で押してもがたつかない。確定した値を README に記録している | 3 |
 | 5 | ✅ 梁とホルダー取り付け面を含むアダプタ全体のモデルを書く | `cad/adapter.py`、`cad/params.py`、`scripts/build.py` | `build/adapter.stl` と `build/adapter.step` が生成される | 4 |
 | 6 | ✅ 自動テストを書く（単一の立体であること、受け口との干渉がゼロであること、造形範囲に収まること） | `tests/test_adapter.py` | `pytest` がすべて通る。`vendor/` に STEP がない環境では干渉テストがスキップされる | 5 |
-| 7 | アダプタ全体を印刷し、ホルダーとスマホを付けて実機で確かめる | `README.md` | 250 g 相当の負荷（スマホまたはおもり）を付けた状態で、作業範囲の端から端までアームを動かし、最大速度で上下させても差し込み部が浮かず、ホルダーが回らない。前腕とスマホが干渉しない。スマホの水準器アプリで、作業範囲の各所で画面が水平（±1° 以内）である | 6 |
-| 8 | カメラ位置のオフセットを計測し、組み立て手順と印刷条件とあわせて README にまとめる | `README.md` | README だけを読んだ第三者が、部品の入手から装着まで行える。先端からカメラまでのオフセット（前後、左右、上下）が mm 単位で記載されている | 7 |
+| 7 | ⏳ 実機待ち。アダプタ全体を印刷し、ホルダーとスマホを付けて実機で確かめる | `README.md` | 250 g 相当の負荷（スマホまたはおもり）を付けた状態で、作業範囲の端から端までアームを動かし、最大速度で上下させても差し込み部が浮かず、ホルダーが回らない。前腕とスマホが干渉しない。スマホの水準器アプリで、作業範囲の各所で画面が水平（±1° 以内）である | 6 |
+| 8 | ⏳ README は記載済み、オフセットの一部が実測待ち。カメラ位置のオフセットを計測し、組み立て手順と印刷条件とあわせて README にまとめる | `README.md` | README だけを読んだ第三者が、部品の入手から装着まで行える。先端からカメラまでのオフセット（前後、左右、上下）が mm 単位で記載されている | 7 |
 
 手順 7 で外れやホルダーの回転が起きた場合は、手順 5 に戻って梁の長さ、取り付け面の座ぐり、吸着材の量を見直す。
