@@ -194,7 +194,7 @@ PLA は夏場の室温や直射日光で変形しやすく、ゴムワッシャ�
 
 | # | やること | 触るファイル | 完了条件 | 前提 |
 |---|---|---|---|---|
-| 1 | CadQuery と pytest の開発環境を用意し、`build/` と `vendor/` を Git の管理から外す | `pyproject.toml`、`.gitignore` | `python -c "import cadquery"` が成功し、`pytest` が 0 件で正常終了する | — |
+| 1 | ✅ CadQuery と pytest の開発環境を用意し、`build/` と `vendor/` を Git の管理から外す | `pyproject.toml`、`.gitignore` | `python -c "import cadquery"` が成功し、`pytest` が 0 件で正常終了する | — |
 | 2 | 公式 STEP を `vendor/` に置き、受け口の内形の寸法、吸着面の構造、ラッチの位置、先端が水平を保つリンク構成かを読み取るスクリプトを書く | `scripts/inspect_step.py` | スクリプトが受け口の主要寸法を出力し、その値を README の「計測値」節に記録している。先端が水平を保つかの結論も記録している | 1 |
 | 3 | 差し込み部だけの試験片のモデルを書き、STL を出力する | `cad/params.py`、`cad/coupon.py`、`scripts/build.py` | `build/coupon.stl` が生成され、干渉テストが通る | 2 |
 | 4 | 試験片を印刷し、受け口への挿入、吸着、ラッチの掛かりを実機で確かめ、`fit_clearance` と `magnet_pocket` を確定させる | `cad/params.py`、`README.md` | 試験片が工具なしで抜き差しでき、ラッチが掛かった状態で手で軽く引いても抜けない。確定した値を README に記録している | 3 |

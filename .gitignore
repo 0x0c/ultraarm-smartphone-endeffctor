@@ -1,0 +1,15 @@
+# 生成物
+build/
+
+# 公式 STEP などの外部ファイル（再配布の条件が不明なため管理しない）
+vendor/*
+!vendor/.gitkeep
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# macOS
+.DS_Store
