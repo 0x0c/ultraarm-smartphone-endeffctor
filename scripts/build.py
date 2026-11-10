@@ -14,10 +14,12 @@ sys.path.insert(0, str(ROOT))
 
 import cadquery as cq  # noqa: E402
 
+from cad.adapter import adapter  # noqa: E402
 from cad.coupon import coupon  # noqa: E402
 
 PARTS = {
     "coupon": coupon,
+    "adapter": adapter,
 }
 
 

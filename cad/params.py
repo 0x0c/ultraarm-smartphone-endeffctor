@@ -50,10 +50,18 @@ class Params:
     """アダプタの設計パラメータ（単位は mm）。値は試作で確定させる。"""
 
     fit_clearance: float = 0.2  # 受け口と差し込み部の片側のすきま
-    beam_length: float = 60.0  # 差し込み部の前端からホルダー取り付け面までの水平距離
+    # 差し込み部の前端からホルダー取り付け面までの水平距離。
+    # つまみねじは取り付け面の後ろから通すので、ねじの頭（D リングで厚さ約 10）と
+    # 指を入れる余地で決まる。前腕との干渉には効かない（スマホは取り付け面より前に出る）。
+    beam_length: float = 30.0
     beam_thickness: float = 6.0  # 梁の厚さ
     mount_plate_thickness: float = 5.0  # ホルダー取り付け面の板厚
+    mount_plate_width: float = 30.0  # ホルダー取り付け面の幅（Y）
+    mount_plate_height: float = 34.0  # ホルダー取り付け面の高さ（底面から）
     screw_hole_diameter: float = 6.6  # 1/4 インチのつまみねじを通す穴の径
+    screw_hole_height: float = 22.0  # ねじ穴の中心の高さ（底面から）
+    gusset_size: float = 12.0  # 梁と取り付け面をつなぐ三角リブの辺の長さ
+    gusset_thickness: float = 3.0  # 三角リブの厚さ
     steel_pin_diameter: float = 3.0  # 舌片の底に圧入する鋼製平行ピンの径
     steel_pin_length: float = 20.0  # 同じく長さ
     steel_pin_press_fit: float = 0.1  # 圧入のための溝幅の詰め代
