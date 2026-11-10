@@ -207,7 +207,7 @@ PLA は夏場の室温や直射日光で変形しやすく、ゴムワッシャ�
 |---|---|---|---|---|
 | 1 | ✅ CadQuery と pytest の開発環境を用意し、`build/` と `vendor/` を Git の管理から外す | `pyproject.toml`、`.gitignore` | `python -c "import cadquery"` が成功し、`pytest` が 0 件で正常終了する | — |
 | 2 | ✅ 公式 STEP を `vendor/` に置き、受け口の内形の寸法、吸着面の構造、ラッチの位置、先端が水平を保つリンク構成かを読み取るスクリプトを書く | `scripts/inspect_step.py` | スクリプトが受け口の主要寸法を出力し、その値を README の「計測値」節に記録している。先端が水平を保つかの結論も記録している | 1 |
-| 3 | 差し込み部だけの試験片のモデルを書き、STL を出力する | `cad/params.py`、`cad/coupon.py`、`scripts/build.py` | `build/coupon.stl` が生成され、干渉テストが通る | 2 |
+| 3 | ✅ 差し込み部だけの試験片のモデルを書き、STL を出力する | `cad/params.py`、`cad/coupon.py`、`scripts/build.py` | `build/coupon.stl` が生成され、干渉テストが通る | 2 |
 | 4 | 試験片を印刷して鋼製ピンを圧入し、受け口への挿入と吸着を実機で確かめ、`fit_clearance` と `steel_pin_press_fit` を確定させる | `cad/params.py`、`README.md` | 試験片が工具なしで抜き差しでき、差し込むと磁石で底まで引き込まれる。前方へ指で押してもがたつかない。確定した値を README に記録している | 3 |
 | 5 | 梁とホルダー取り付け面を含むアダプタ全体のモデルを書く | `cad/adapter.py`、`cad/params.py`、`scripts/build.py` | `build/adapter.stl` と `build/adapter.step` が生成される | 4 |
 | 6 | 自動テストを書く（単一の立体であること、受け口との干渉がゼロであること、造形範囲に収まること） | `tests/test_adapter.py` | `pytest` がすべて通る。`vendor/` に STEP がない環境では干渉テストがスキップされる | 5 |
