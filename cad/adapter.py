@@ -4,7 +4,9 @@
 - 差し込み部: `cad.insert` と同じもの。本体の前面は X = 前面 + すきま + 本体の厚さ
 - 梁: 本体の前面から前方へ伸びる底板。底面は差し込み部の底面とそろえる
 - ホルダー取り付け面: 梁の先端に立つ鉛直の板。1/4 インチのねじ穴は X 方向に貫通する
-- 三角リブ: 梁と取り付け面の角を左右で補強する。中央はつまみねじを回す指のために空ける
+- 三角リブ: 梁と取り付け面の角を左右で補強する。取り付け面の上端まで届かせ、
+  積層をまたいで曲げを受ける取り付け面を支える。中央はつまみねじを回す指のために空ける
+- 内側の角の丸め: 梁と本体、梁と取り付け面の角に入れ、応力の集中を和らげる
 
 部品全体の底面が 1 つの平面にそろうので、そのまま造形面に置いて印刷できる。
 """
@@ -57,7 +59,7 @@ def adapter(p: Params = PARAMS, r: Receiver = RECEIVER) -> cq.Workplane:
     zt = z0 + p.beam_thickness
     tri = (
         cq.Workplane("XZ")
-        .polyline([(mx0 + 0.5, zt - 0.5), (mx0 - g, zt - 0.5), (mx0 + 0.5, zt + g)])
+        .polyline([(mx0 + 0.5, zt - 0.5), (mx0 - g, zt - 0.5), (mx0 + 0.5, zt + p.gusset_height)])
         .close()
         .extrude(p.gusset_thickness)  # XZ 平面の押し出しは -Y 方向
     )
@@ -70,4 +72,26 @@ def adapter(p: Params = PARAMS, r: Receiver = RECEIVER) -> cq.Workplane:
         .extrude(p.mount_plate_thickness + 2)
     )
 
-    return insert(p, r).union(beam).union(plate).union(gussets).cut(hole)
+    hw = min(hb, hm)
+    fillets = _inner_fillet(bx, zt, +1, p.fillet_radius, hw).union(
+        _inner_fillet(mx0, zt, -1, p.fillet_radius, hw)
+    )
+
+    return insert(p, r).union(beam).union(plate).union(gussets).union(fillets).cut(hole)
+
+
+def _inner_fillet(x: float, z: float, sign: int, radius: float, half_width: float) -> cq.Workplane:
+    """鉛直の面（X = x）と梁の上面（Z = z）がなす内側の角を埋める丸め。
+
+    sign は角が開いている向きで、+1 なら面の前方（+X）、-1 なら後方に丸めを置く。
+    """
+    x0, x1 = (x, x + radius) if sign > 0 else (x - radius, x)
+    block = _box(x0, x1, -half_width, half_width, z - 0.01, z + radius)
+    cx = x + sign * radius
+    cut = (
+        cq.Workplane("XZ", origin=(0, half_width + 1, 0))
+        .center(cx, z + radius)
+        .circle(radius)
+        .extrude(2 * half_width + 2)
+    )
+    return block.cut(cut)

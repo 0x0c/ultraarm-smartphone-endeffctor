@@ -55,13 +55,19 @@ class Params:
     # 指を入れる余地で決まる。前腕との干渉には効かない（スマホは取り付け面より前に出る）。
     beam_length: float = 30.0
     beam_thickness: float = 6.0  # 梁の厚さ
-    mount_plate_thickness: float = 5.0  # ホルダー取り付け面の板厚
+    # ホルダー取り付け面の板厚。積層をまたいで曲げを受けるので 5 から 6 に厚くした。
+    # つまみねじは板厚 + ゴムワッシャ（約 1）を通ってからホルダーに入る。
+    mount_plate_thickness: float = 6.0
     mount_plate_width: float = 30.0  # ホルダー取り付け面の幅（Y）
     mount_plate_height: float = 34.0  # ホルダー取り付け面の高さ（底面から）
     screw_hole_diameter: float = 6.6  # 1/4 インチのつまみねじを通す穴の径
     screw_hole_height: float = 22.0  # ねじ穴の中心の高さ（底面から）
-    gusset_size: float = 12.0  # 梁と取り付け面をつなぐ三角リブの辺の長さ
+    # 梁と取り付け面をつなぐ三角リブ。左右の縁に置き、中央はつまみねじの頭のために空ける。
+    gusset_size: float = 12.0  # 梁の上での前後方向の長さ
+    gusset_height: float = 28.0  # 梁の上面からの高さ。取り付け面の上端まで届かせる
     gusset_thickness: float = 3.0  # 三角リブの厚さ
+    # 梁と本体、梁と取り付け面の内側の角の丸め半径。応力の集中を和らげる
+    fillet_radius: float = 3.0
     steel_pin_diameter: float = 3.0  # 舌片の底に圧入する鋼製平行ピンの径
     steel_pin_length: float = 20.0  # 同じく長さ
     steel_pin_press_fit: float = 0.1  # 圧入のための溝幅の詰め代

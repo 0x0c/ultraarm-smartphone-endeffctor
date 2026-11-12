@@ -5,7 +5,7 @@ from __future__ import annotations
 import cadquery as cq
 import pytest
 
-from cad.adapter import adapter, mount_plate_x, screw_axis
+from cad.adapter import adapter, body_front_x, mount_plate_x, screw_axis
 from cad.params import PARAMS, RECEIVER
 
 INTERFERENCE_TOL = 1e-3
@@ -90,3 +90,32 @@ def test_screw_hole_has_wall_around_it():
     assert top - (z + r) >= 3.0
     assert (z - r) - bottom >= 3.0
     assert PARAMS.mount_plate_width / 2 - r >= 3.0
+
+
+def _section_area(shape: cq.Shape, z: float, t: float = 0.02) -> float:
+    slab = cq.Solid.makeBox(400, 400, t, cq.Vector(-200, -200, z))
+    return shape.intersect(slab).Volume() / t
+
+
+def test_ribs_support_mount_plate_at_screw_height(shape):
+    """三角リブがねじ穴の高さまで届き、積層をまたいで曲げを受ける取り付け面を支える。"""
+    _, _, z = screw_axis()
+    plate_only = (PARAMS.mount_plate_width - PARAMS.screw_hole_diameter) * PARAMS.mount_plate_thickness
+    assert _section_area(shape, z) > 1.1 * plate_only
+
+
+def test_ribs_leave_room_for_screw_head():
+    """左右のリブの間に、つまみねじの頭（D リングで直径 20 程度）を回す幅が残る。"""
+    assert PARAMS.mount_plate_width - 2 * PARAMS.gusset_thickness >= 22.0
+
+
+@pytest.mark.parametrize("corner", ["body", "plate"])
+def test_inner_corners_are_filleted(shape, corner):
+    """梁と本体、梁と取り付け面の内側の角が丸めで埋まっている。"""
+    zt = -RECEIVER.pocket_depth + PARAMS.beam_thickness
+    rad = PARAMS.fillet_radius
+    x, sign = (body_front_x(), 1) if corner == "body" else (mount_plate_x()[0], -1)
+    near = cq.Vector(x + sign * 0.15 * rad, 0, zt + 0.15 * rad)
+    far = cq.Vector(x + sign * 0.95 * rad, 0, zt + 0.95 * rad)
+    assert shape.isInside(near)
+    assert not shape.isInside(far)
